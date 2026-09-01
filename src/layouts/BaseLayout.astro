@@ -1,0 +1,156 @@
+---
+// BaseLayout：RTL 布局外壳（对标站全站 dir=rtl + 移动抽屉 + 全屏搜索）
+import '../styles/global.css';
+import { SITE, HUBS } from '../config';
+import Footer from '../components/Footer.astro';
+
+const {
+  title,
+  description,
+  ogType = 'website',
+  image,
+} = Astro.props;
+
+const fmtTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
+---
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fmtTitle}</title>
+    <meta name="description" content={description || SITE.description} />
+    <meta name="keywords" content="قوالب عربية,تأمين,ذكاء اصطناعي,عقود قانونية" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, SITE.url).toString()} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — خلاصة`} href="/rss.xml" />
+    <meta name="theme-color" content="#0f6b4f" />
+    <meta name="robots" content={Astro.url.pathname === '/search/' ? 'noindex,follow' : 'index,follow'} />
+
+    <!-- OG / Twitter -->
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fmtTitle} />
+    <meta property="og:description" content={description || SITE.description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, SITE.url).toString()} />
+    <meta property="og:image" content={image || new URL('/og-default.svg', SITE.url).toString()} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fmtTitle} />
+    <meta name="twitter:description" content={description || SITE.description} />
+    <meta name="twitter:image" content={image || new URL('/og-default.svg', SITE.url).toString()} />
+
+    <!-- Schema 组织站点级 -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          name: SITE.name,
+          url: SITE.url,
+          logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', SITE.url).toString() },
+        },
+        {
+          '@type': 'WebSite',
+          name: SITE.name,
+          url: SITE.url,
+          inLanguage: 'ar',
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: { '@type': 'EntryPoint', urlTemplate: `${SITE.url}/search/?q={search_term_string}` },
+            'query-input': 'required name=search_term_string',
+          },
+        },
+      ],
+    })} />
+
+    <!-- 阿拉伯字体：正文 Cairo，段落数字 Western 0-9 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">تخطّ إلى المحتوى</a>
+
+    <!-- Header -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/">
+          <span class="brand-logo">📜</span>
+          <span>{SITE.name}</span>
+        </a>
+        <nav class="main-nav" aria-label="التنقل الرئيسي">
+          {HUBS.map((h) => (
+            <a href={`/${h.slug}/`}><span class="nav-icon">{h.icon}</span>{h.navPt}</a>
+          ))}
+          <a href="/حول/">من نحن</a>
+        </nav>
+        <button class="search-btn" id="open-search" aria-label="بحث" title="بحث"> &#128269;</button>
+        <button class="burger" id="open-drawer" aria-label="القائمة">&#9776;</button>
+      </div>
+    </header>
+
+    <!-- 移动抽屉 -->
+    <div class="drawer-mask" id="drawer-mask"></div>
+    <aside class="drawer" id="drawer" aria-label="قائمة الجوال">
+      <button class="drawer-close" id="close-drawer" aria-label="إغلاق">&#10005;</button>
+      <div class="drawer-head">{SITE.name}</div>
+      <nav>
+        {HUBS.map((h) => (
+          <a href={`/${h.slug}/`}><span class="nav-menu-icon">{h.icon}</span>{h.navPt}</a>
+        ))}
+        <a href="/حول/">&#128100; من نحن</a>
+        <a href="/سياسة-الخصوصية/">&#128274; الخصوصية</a>
+        <a href="/اتصل-بنا/">&#9993; اتصل بنا</a>
+      </nav>
+    </aside>
+
+    <!-- 全屏搜索 -->
+    <div class="search-layer" id="search-layer">
+      <button class="search-close" id="close-search" aria-label="إغلاق البحث">&#10005;</button>
+      <div class="search-box">
+        <input type="search" id="search-input" placeholder="ابحث عن قالب أو دليل…" />
+        <div class="search-results" id="search-results"></div>
+      </div>
+    </div>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <script>
+      // 抽屉
+      const mask = document.getElementById('drawer-mask');
+      const drawer = document.getElementById('drawer');
+      document.getElementById('open-drawer')?.addEventListener('click', () => { drawer?.classList.add('open'); mask?.classList.add('open'); });
+      document.getElementById('close-drawer')?.addEventListener('click', closeDrawer);
+      mask?.addEventListener('click', closeDrawer);
+      function closeDrawer() { drawer?.classList.remove('open'); mask?.classList.remove('open'); }
+
+      // 全屏搜索
+      const layer = document.getElementById('search-layer');
+      const input = document.getElementById('search-input');
+      const results = document.getElementById('search-results');
+      fetch('/search-index.json').then((r) => r.json()).then((INDEX) => {
+        input?.addEventListener('input', () => {
+          const q = input.value.trim().toLowerCase();
+          if (!q) { if (results) results.innerHTML = ''; return; }
+          const hits = INDEX.filter((d) => (d.t + ' ' + d.k).toLowerCase().includes(q)).slice(0, 8);
+          if (results) {
+            results.innerHTML = hits.length
+              ? hits.map((d) => `<a href="${d.u}">${d.t}<span class="tag"> · ${d.c}</span></a>`).join('')
+              : `<div class="tag" style="padding:10px 4px">لا نتائج مطابقة.</div>`;
+          }
+        });
+      });
+      document.getElementById('open-search')?.addEventListener('click', () => { layer?.classList.add('open'); input?.focus(); });
+      document.getElementById('close-search')?.addEventListener('click', () => layer?.classList.remove('open'));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') layer?.classList.remove('open'); });
+    </script>
+  </body>
+</html>

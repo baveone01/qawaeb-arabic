@@ -1,0 +1,37 @@
+---
+import { SITE, HUBS } from '../config';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">{SITE.name}</div>
+        <p class="footer-desc">{SITE.tagline}</p>
+      </div>
+      <div>
+        <h4>الأقسام</h4>
+        {HUBS.map((h) => (
+          <a href={`/${h.slug}/`}><span class="nav-menu-icon">{h.icon}</span>{h.navPt}</a>
+        ))}
+      </div>
+      <div>
+        <h4>روابط</h4>
+        <a href="/حول/">من نحن</a>
+        <a href="/اتصل-بنا/">اتصل بنا</a>
+        <a href="/سياسة-الخصوصية/">سياسة الخصوصية</a>
+        <a href="/إخلاء-المسؤولية/">إخلاء المسؤولية</a>
+        <a href="/rss.xml">خلاصة RSS</a>
+      </div>
+      <div>
+        <h4>تواصل</h4>
+        <a dir="ltr" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        <a href="/search/?q=">البحث</a>
+      </div>
+    </div>
+    <div class="footer-note">
+      © {year} {SITE.name}. جميع الحقوق محفوظة. محتوى الموقع لأغراض إعلامية فقط ولا يُعدّ استشارة قانونية.
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,23 @@
+---
+import HubLayout from '../../layouts/HubLayout.astro';
+import { getHubByKey } from '../../config';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const cats = ['legal', 'insurance', 'ai'] as const;
+  const all = (await Promise.all(cats.map((c) => getCollection(c)))).flat();
+  return all.map((p) => {
+    const hub = getHubByKey(p.data.category)!;
+    return { params: { hub: hub.slug }, props: { hub, posts: all.filter((x) => x.data.category === hub.key) } };
+  });
+}
+
+const { hub, posts } = Astro.props;
+const sorted = [...posts].sort((a, b) => +b.data.date - +a.data.date);
+---
+<HubLayout
+  title={hub.name}
+  description={hub.desc}
+  hub={hub}
+  posts={sorted}
+/>

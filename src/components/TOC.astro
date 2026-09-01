@@ -1,0 +1,16 @@
+---
+// TOC：文章目录，锚点跳转（对标站 TOC 模块）
+const { headings } = Astro.props; // [{id, text, depth}]
+---
+{headings && headings.length > 0 && (
+  <nav class="toc" aria-label="جدول المحتويات">
+    <div class="toc-title">📑 جدول المحتويات</div>
+    <ul>
+      {headings.filter((h) => h.depth <= 3).map((h) => (
+        <li style={h.depth === 3 ? 'padding-inline-start:14px' : ''}>
+          <a href={`#${h.id}`}>{h.text}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}

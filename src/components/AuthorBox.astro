@@ -1,0 +1,16 @@
+---
+// AuthorBox：作者信息框（对标站文章尾作者框）
+const { author = 'فريق قوالب عربية', intro } = Astro.props;
+function initials(n: string) {
+  return n.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0] || '').join(' ');
+}
+---
+<div class="author-box">
+  <div class="author-avatar">{initials(author)}</div>
+  <div>
+    <strong>{author}</strong>
+    <div style="font-size:0.9rem;color:#4a5068">
+      {intro || 'كاتب محتوى مختص، يقدّم قوالب وشروحات عملية بالعربية.'}
+    </div>
+  </div>
+</div>

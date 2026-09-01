@@ -1,0 +1,94 @@
+---
+// ArticleLayout：文章页总装（对标站文章模板：标题+日期+作者+TOC+正文+作者框+分享+相关+schema）
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import TOC from '../components/TOC.astro';
+import FAQ from '../components/FAQ.astro';
+import AuthorBox from '../components/AuthorBox.astro';
+import ShareButtons from '../components/ShareButtons.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import TemplateFiller from '../components/TemplateFiller.astro';
+import { SITE, getHubByKey } from '../config';
+
+const { post, related } = Astro.props;
+const { Content, headings } = await post.render();
+const d = post.data;
+const hub = getHubByKey(d.category)!;
+const url = Astro.url.href;
+const dateFmt = new Intl.DateTimeFormat('ar', { year: 'numeric', month: 'long', day: 'numeric' }).format(d.date);
+
+const pageSchema = buildSchema();
+function buildSchema() {
+  const base = {
+    '@context': 'https://schema.org',
+    headline: d.title,
+    description: d.description,
+    author: { '@type': 'Person', name: d.author },
+    datePublished: d.date.toISOString(),
+    dateModified: (d.updated ?? d.date).toISOString(),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    image: `${SITE.url}/og-default.svg`,
+    publisher: { '@type': 'Organization', name: SITE.name, logo: { '@type': 'ImageObject', url: `${SITE.url}/favicon.svg` } },
+  };
+  if (d.seo.schemaType === 'howto') {
+    const steps = headings
+      .filter((h) => h.depth === 2)
+      .map((h, i) => ({ '@type': 'HowToStep', position: i + 1, name: h.text.replace(/^[\d\s.]+/, '') }));
+    return { '@context': 'https://schema.org', '@type': 'HowTo', name: d.title, description: d.description, step: steps };
+  }
+  if (d.seo.schemaType === 'creativework') {
+    return { '@context': 'https://schema.org', '@type': 'CreativeWork', ...base, learningResourceType: d.tags };
+  }
+  return { '@context': 'https://schema.org', '@type': 'Article', ...base, articleBody: 'أنظر النص الكامل أدناه.' };
+}
+---
+<BaseLayout title={d.title} description={d.description}>
+  <div class="container">
+    <article>
+      <header class="article-header">
+        <Breadcrumb hubPt={hub.navPt} hubUrl={`/${hub.slug}/`} title={d.title} />
+        <div class="post-meta" style="margin-block-end:10px">
+          <span class="badge">{hub.icon} {hub.navPt}</span>
+          <span>📅 {dateFmt}</span>
+          <span>👤 {d.author}</span>
+        </div>
+        <h1>{d.title}</h1>
+        {d.description && <p class="article-lead">{d.description}</p>}
+      </header>
+
+      <div class="article-layout">
+        <TOC headings={headings} />
+
+        <div class="article-body">
+          {d.answer && (
+            <div class="callout tip"><span class="em">💡</span><span class="tx"><strong>إجابة سريعة:</strong> {d.answer}</span></div>
+          )}
+          <Content />
+
+          {d.template?.enabled && (
+            <TemplateFiller fields={d.template.fields} body={d.template.body} note={d.template.note} />
+          )}
+
+          {d.faqs.length > 0 && (
+            <>
+              <h2>الأسئلة الشائعة</h2>
+              <FAQ faqs={d.faqs} />
+            </>
+          )}
+
+          <div class="callout info"><span class="em">📌</span><span class="tx">{SITE.description}</span></div>
+
+          <AuthorBox author={d.author} />
+          <ShareButtons title={d.title} />
+
+          {related?.all && related.all.length > 0 && (
+            <RelatedArticles current={related?.current} list={related.all} hubUrl={`/${hub.slug}/`} />
+          )}
+        </div>
+      </div>
+
+      <div class="legal-note">{SITE.disclaimer}</div>
+    </article>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(pageSchema)} />
+</BaseLayout>

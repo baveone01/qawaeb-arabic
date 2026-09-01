@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, HUBS } from '../config';
+---
+<BaseLayout title="من نحن">
+  <div class="container" style="max-width:820px">
+    <div class="article-body" style="margin:24px 0 40px">
+      <h1>من نحن</h1>
+      <p>
+        <strong>{SITE.name}</strong> منصة عربية مجانية تركّز على ثلاثة مجالات يبحث عنها المستخدم العرب:
+      </p>
+      <ul>
+        {HUBS.map((h) => (
+          <li><strong>{h.icon} {h.name}</strong> — {h.desc}</li>
+        ))}
+      </ul>
+      <p>
+        نسعى أن يكون المحتوى عملياً وجاهزاً للاستخدام: قوالب عقود ونماذج سليمة يمكن تعبئتها
+        وطباعتها داخل المتصفح، مقارنات تأمين واضحة، ودروس ذكاء اصطناعي خطوة بخطوة بالعربية.
+      </p>
+      <h2>التزامنا بالجودة والشفافية</h2>
+      <ul>
+        <li>المحتوى مكتوب بالعربية الفصحى ويُحدَّث دورياً.</li>
+        <li>القوالب نتاج إرشادي وليس بديلاً عن استشارة مختص.</li>
+        <li>لا نشارك بياناتك الشخصية ولا نستخدم ملفات تتبّع غير ضرورية.</li>
+      </ul>
+      <h2>تواصل معنا</h2>
+      <p>لأي استفسار أو اقتراح: <a dir="ltr" href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+    </div>
+  </div>
+</BaseLayout>

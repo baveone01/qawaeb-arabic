@@ -1,0 +1,32 @@
+---
+// [hub]/[slug].astro：文章页（动态），含相关文章互链
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { getHubByKey } from '../../config';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const cats = ['legal', 'insurance', 'ai'] as const;
+  const all = (await Promise.all(cats.map((c) => getCollection(c)))).flat();
+  return all.map((p) => {
+    const hub = getHubByKey(p.data.category)!;
+    return { params: { hub: hub.slug, slug: p.slug }, props: { post: p, hub } };
+  });
+}
+
+const { post, hub } = Astro.props;
+const cats = ['legal', 'insurance', 'ai'] as const;
+const all = (await Promise.all(cats.map((c) => getCollection(c)))).flat();
+
+// 相关文章（同 hub + 跨 hub 各取几条，保证内链互连）
+const sections = post.data.seo?.keywords ?? [];
+const same = all.filter((p) => p.id !== post.id && p.data.category === hub.key);
+const cross = all.filter((p) => p.id !== post.id && p.data.category !== hub.key);
+const current = (sections.length > 0 ? all.filter((p) => p.id !== post.id && p.data.seo?.keywords?.some((k) => sections.includes(k))) : []).slice(0, 4);
+
+const relatedMeta = {
+  current,
+  all: [...same.slice(0, 3), ...cross.slice(0, 3)],
+  steps: [],
+};
+---
+<ArticleLayout post={post} related={relatedMeta} />

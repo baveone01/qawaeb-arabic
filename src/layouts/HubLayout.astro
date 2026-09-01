@@ -1,0 +1,41 @@
+---
+// HubLayout：分类中枢页（卡片网格，对标站分类页）
+import BaseLayout from './BaseLayout.astro';
+import { SITE } from '../config';
+const { title, description, posts, hub } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: title,
+    description,
+    inLanguage: 'ar',
+    url: new URL(Astro.url.pathname, SITE.url).toString(),
+    mainEntity: { '@type': 'ItemList', numberOfItems: posts.length },
+  })} />
+  <div class="container">
+    <div class="hero">
+      <div class="crumbs"><a href="/">الرئيسية</a> <span>/</span> <span>{hub.navPt}</span></div>
+      <h1>{hub.icon} {title}</h1>
+      <p>{description}</p>
+    </div>
+
+    {posts.length > 0 ? (
+      <div class="post-grid">
+        {posts.map((p) => (
+          <article class="post-card">
+            <h3><a href={`/${hub.slug}/${p.slug}/`}>{p.data.title}</a></h3>
+            <div class="post-meta">
+              <span class="badge">{p.data.category === 'legal' && p.data.template?.enabled ? '✨ قالب قابل للتعبئة' : hub.icon}</span>
+              <span>{new Intl.DateTimeFormat('ar', { year: 'numeric', month: 'short' }).format(p.data.date)}</span>
+            </div>
+            <p>{p.data.description}</p>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p class="placeholder">سوف تُضاف مقالات هذا القسم قريباً.</p>
+    )}
+  </div>
+</BaseLayout>

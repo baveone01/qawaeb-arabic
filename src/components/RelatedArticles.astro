@@ -1,0 +1,23 @@
+---
+// RelatedArticles：相关文章（Hub主题互链）
+import { getHubByKey } from '../config';
+const { current, list, hubUrl } = Astro.props;
+// current=[{title,url,note}], list=[{title,url,category}]
+---
+<div class="related">
+  <h3>🔄 مواضيع ذات صلة</h3>
+  {current && current.length > 0 && (
+    <ul>
+      {current.map((c) => (
+        <li><a href={c.url}>{c.title}</a> <span class="tag">{c.note}</span></li>
+      ))}
+    </ul>
+  )}
+  {list && list.length > 0 && (
+    <ul>
+      {list.slice(0, 6).map((p) => (
+        <li><a href={p.url}>{p.title}</a> <span class="tag">· {getHubByKey(p.category)?.navPt}</span></li>
+      ))}
+    </ul>
+  )}
+</div>

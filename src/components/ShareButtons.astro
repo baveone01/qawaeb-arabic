@@ -1,0 +1,26 @@
+---
+// ShareButtons：社交分享（对标站的分享栏）
+const { title } = Astro.props;
+const u = Astro.url.href;
+const enc = encodeURIComponent;
+const wa = `https://wa.me/?text=${enc(title + '\n' + u)}`;
+const x = `https://twitter.com/intent/tweet?url=${enc(u)}&text=${enc(title)}`;
+const li = `https://www.linkedin.com/sharing/share-offsite/?url=${enc(u)}`;
+---
+<div class="share-row">
+  <span class="lbl">شارك:</span>
+  <button class="share-btn" data-via="copy" data-url={u}>📋 نسخ الرابط</button>
+  <a class="share-btn" href={wa} target="_blank" rel="noopener">💬 واتساب</a>
+  <a class="share-btn" href={x} target="_blank" rel="noopener">𝕏</a>
+  <a class="share-btn" href={li} target="_blank" rel="noopener">in</a>
+</div>
+<script>
+  document.querySelectorAll('[data-via="copy"]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.url || '');
+        btn.textContent = '✓ تم النسخ';
+      } catch { /* clipboard blocked */ }
+    });
+  });
+</script>

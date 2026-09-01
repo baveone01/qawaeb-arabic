@@ -1,0 +1,60 @@
+---
+// TemplateFiller：法律模板自动填写工具（客户端的工具承接价值）
+// props: fields [{key,label,placeholder}], body(含[[key]]占位符), note
+const { fields = [], body, note } = Astro.props;
+const keys = fields.map((f) => f.key);
+---
+<div class="tool-card">
+  <div class="tool-head">✍️ أداة تعبئة القالب آلياً</div>
+  <div class="tool-sub">املأ الحقول أدناه ثم اضغط «توليد»، وانسخ أو اطبع النص الجاهز. يعمل كل شيء على جهازك.</div>
+  <form id="tf-form">
+    <div class="fill-grid">
+      {fields.map((f) => (
+        <label>
+          {f.label}
+          <input type="text" name={f.key} placeholder={f.placeholder || f.label} required={false} />
+        </label>
+      ))}
+    </div>
+    <div class="tool-actions">
+      <button type="submit" class="btn btn-primary">توليد القالب</button>
+      <button type="button" class="btn btn-ghost" id="tf-print">🖨️ طباعة</button>
+      <button type="button" class="btn btn-ghost" id="tf-copy">📋 نسخ</button>
+    </div>
+  </form>
+  <pre id="tf-result" class="result-box"></pre>
+  <div class="tool-note">{note || 'القالب نتيجة إرشادية؛ راجعه مع مختص قبل الاستخدام الرسمي.'}</div>
+</div>
+<script define:vars={{ fields, body, keys }}>
+  const form = document.getElementById('tf-form') as HTMLFormElement;
+  const box = document.getElementById('tf-result') as HTMLPreElement;
+  let current = '';
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let text = body;
+    for (const k of keys) {
+      const node = form.elements.namedItem(k) as HTMLInputElement;
+      const v = (node?.value || '').trim();
+      text = text.split(`[[${k}]]`).join(v || '________________');
+    }
+    current = text;
+    box.textContent = text;
+    box.classList.add('show');
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  document.getElementById('tf-copy')?.addEventListener('click', async () => {
+    if (!current) return;
+    try { await navigator.clipboard.writeText(current); (document.getElementById('tf-copy') as HTMLButtonElement).textContent = '✓ تم النسخ'; }
+    catch { /* blocked */ }
+  });
+  document.getElementById('tf-print')?.addEventListener('click', () => {
+    if (!current && box.textContent) current = box.textContent;
+    if (!current) return;
+    const w = window.open('', '_blank', 'width=720,height=900');
+    if (!w) return;
+    w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>قالب</title>
+      <style>body{font-family:'Cairo',sans-serif;direction:rtl;padding:40px;line-height:2;color:#111}pre{white-space:pre-wrap;font-family:inherit}</style></head><body><pre>${box.textContent || current}</pre></body></html>`);
+    w.document.close();
+    w.print();
+  });
+</script>

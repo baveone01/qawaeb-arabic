@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { HUBS, SITE, getHubByKey } from '../config';
+import { getCollection } from 'astro:content';
+
+const cats = ['legal', 'insurance', 'ai'] as const;
+const all = (await Promise.all(cats.map((c) => getCollection(c)))).flat();
+const recent = [...all].sort((a, b) => +b.data.date - +a.data.date).slice(0, 12);
+const byHub = (key: string) => all.filter((p) => p.data.category === key).length;
+---
+<BaseLayout>
+  <div class="container">
+    <section class="hero">
+      <h1>قوالب عربية — {SITE.tagline}</h1>
+      <p>
+        مكتبة عربية مجانية للقوالب القانونية والإدارية الجاهزة للتحميل والطباعة، مقارنات تأمين
+        شاملة، ودروس عملية بالذكاء الاصطناعي. كل الأدوات تعمل في متصفحك مباشرة وبدون تسجيل.
+      </p>
+    </section>
+
+    <div class="hub-grid">
+      {HUBS.map((h) => (
+        <a class="hub-card" href={`/${h.slug}/`}>
+          <div class="ic">{h.icon}</div>
+          <h3>{h.name}</h3>
+          <p>{h.desc}</p>
+          <div class="post-meta" style="margin-top:10px">
+            <span class="badge gold">{byHub(h.key)} مقالات</span>
+          </div>
+          <div class="arrow" style="margin-top:8px">تصفّح القسم ←</div>
+        </a>
+      ))}
+    </div>
+
+    <h2 class="section-title">🆕 أحدث المقالات</h2>
+    <div class="post-grid">
+      {recent.map((p) => {
+        const hub = getHubByKey(p.data.category)!;
+        return (
+          <article class="post-card">
+            <h3><a href={`/${hub.slug}/${p.slug}/`}>{p.data.title}</a></h3>
+            <div class="post-meta">
+              <span class="badge">{hub.icon} {hub.navPt}</span>
+              <span>{new Intl.DateTimeFormat('ar', { year: 'numeric', month: 'short', day: 'numeric' }).format(p.data.date)}</span>
+            </div>
+            <p>{p.data.description}</p>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>

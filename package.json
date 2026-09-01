@@ -1,0 +1,23 @@
+{
+  "name": "qawaeb-arabic",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.7",
+    "astro": "^4.16.18",
+    "typescript": "^5.6.3"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^4.1.11",
+    "gray-matter": "^4.0.3",
+    "vitest": "^4.1.11"
+  }
+}
