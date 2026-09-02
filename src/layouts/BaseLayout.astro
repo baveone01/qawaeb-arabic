@@ -27,6 +27,9 @@ const fmtTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.
     <meta name="theme-color" content="#0f6b4f" />
     <meta name="robots" content={Astro.url.pathname === '/search/' ? 'noindex,follow' : 'index,follow'} />
 
+    <!-- Cloudflare Web Analytics -->
+    <script is:inline type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "091813b407014362a231109033165e5d"}' />
+
     <!-- OG / Twitter -->
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={fmtTitle} />
