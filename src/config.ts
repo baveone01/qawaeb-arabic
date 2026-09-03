@@ -3,7 +3,7 @@ export const SITE = {
   name: 'قوالب عربية',
   nameEn: 'Arab Templates',
   tagline: 'قوالب قانونية وإدارية، مقارنات تأمين، ودروس الذكاء الاصطناعي بالعربية',
-  url: 'https://qawaeb-arabic.pages.dev',
+  url: 'https://qawaeb.snapvil.com',
   description:
     'منصة عربية لتحميل وطباعة القوالب القانونية والإدارية، مقارنات تأمين، ودروس عملية في الذكاء الاصطناعي.',
   locale: 'ar',

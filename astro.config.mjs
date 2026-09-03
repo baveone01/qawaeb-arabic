@@ -3,7 +3,7 @@ import rss from '@astrojs/rss';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://qawaeb-arabic.pages.dev',
+  site: 'https://qawaeb.snapvil.com',
   trailingSlash: 'always',
   markdown: {
     shikiConfig: {
