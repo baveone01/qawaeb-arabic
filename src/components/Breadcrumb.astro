@@ -1,6 +1,10 @@
 ---
 // Breadcrumb：面包屑（对标分类路径式面包屑）
+import { SITE } from '../config';
 const { hubPt, hubUrl, title } = Astro.props;
+const pageUrl = new URL(Astro.url.pathname, SITE.url).toString();
+const homeUrl = SITE.url + '/';
+const hubAbs = new URL(hubUrl, SITE.url).toString();
 ---
 <nav class="crumbs" aria-label="مسار التنقل">
   <a href="/">الرئيسية</a>
@@ -13,8 +17,8 @@ const { hubPt, hubUrl, title } = Astro.props;
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: '/ ' },
-    { '@type': 'ListItem', position: 2, name: hubPt, item: hubUrl },
-    { '@type': 'ListItem', position: 3, name: title },
+    { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: homeUrl },
+    { '@type': 'ListItem', position: 2, name: hubPt, item: hubAbs },
+    { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
   ],
 })} />

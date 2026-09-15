@@ -42,7 +42,7 @@ function buildSchema() {
   return { '@context': 'https://schema.org', '@type': 'Article', ...base, articleBody: 'أنظر النص الكامل أدناه.' };
 }
 ---
-<BaseLayout title={d.title} description={d.description}>
+<BaseLayout title={d.title} description={d.description} ogType="article">
   <div class="container">
     <article>
       <header class="article-header">

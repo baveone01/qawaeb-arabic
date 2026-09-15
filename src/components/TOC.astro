@@ -8,7 +8,7 @@ const { headings } = Astro.props; // [{id, text, depth}]
     <ul>
       {headings.filter((h) => h.depth <= 3).map((h) => (
         <li style={h.depth === 3 ? 'padding-inline-start:14px' : ''}>
-          <a href={`#${h.id}`}>{h.text}</a>
+          <a href={`#${h.slug}`}>{h.text}</a>
         </li>
       ))}
     </ul>
